@@ -1,7 +1,7 @@
 import unittest
 from textnode import *
-from split_functions import *
-
+from split_inline import *
+from split_block import *
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
@@ -105,6 +105,16 @@ class TestTextNode(unittest.TestCase):
             TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
             TextNode(" and a ", TextType.TEXT),
             TextNode("link", TextType.LINK, "https://boot.dev"),
+        ]
+        self.assertEqual(result, expected)
+
+    def test_split_block(self):
+        markdown = "# This is a heading\n\nThis is a paragraph of text. It has some **bold** and *italic* words inside of it.\n\n* This is the first list item in a list block\n* This is a list item\n* This is another list item"
+        result = markdown_to_blocks(markdown)
+        expected = [
+            "# This is a heading", 
+            "This is a paragraph of text. It has some **bold** and *italic* words inside of it.",
+            "* This is the first list item in a list block\n* This is a list item\n* This is another list item"
         ]
         self.assertEqual(result, expected)
 
