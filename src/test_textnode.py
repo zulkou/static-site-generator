@@ -124,5 +124,31 @@ class TestTextNode(unittest.TestCase):
         for i, n in enumerate(nodes):
             print(f"Node {i}: text='{n.text}', type={n.text_type}, url={n.url}")
 
+    def test_block_to_block_type(self):
+        assert block_to_block_type("# Heading") == "heading"
+        assert block_to_block_type("## Heading 2") == "heading"
+        assert block_to_block_type("#Not a heading") == "paragraph"  # no space after #
+
+        assert block_to_block_type("```\nsome code\n```") == "code"
+        assert block_to_block_type("```\nMultiple\nLines\n```") == "code"
+        assert block_to_block_type("```no end") == "paragraph"
+
+        assert block_to_block_type("1. First\n2. Second") == "ordered_list"
+        assert block_to_block_type("1. Only one") == "ordered_list"
+        assert block_to_block_type("2. Wrong start") == "paragraph"
+
+        assert block_to_block_type("> A quote") == "quote"
+        assert block_to_block_type("> Line 1\n> Line 2") == "quote"
+        assert block_to_block_type(">No space") == "paragraph"
+
+    
+        assert block_to_block_type("* Item 1\n* Item 2") == "unordered_list"
+        assert block_to_block_type("- Item 1\n- Item 2") == "unordered_list"
+        assert block_to_block_type("*No space") == "paragraph"
+
+        assert block_to_block_type("Just a normal paragraph") == "paragraph"
+        assert block_to_block_type("Multiple\nLine\nParagraph") == "paragraph"
+
+
 if __name__ == "__main__":
     unittest.main()
