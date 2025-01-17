@@ -149,6 +149,32 @@ class TestTextNode(unittest.TestCase):
         assert block_to_block_type("Just a normal paragraph") == "paragraph"
         assert block_to_block_type("Multiple\nLine\nParagraph") == "paragraph"
 
+    def test_markdown_to_html_node(self):
+        markdown = "This is a paragraph"
+        root = markdown_to_html_node(markdown)
+        assert root.tag == "div"
+        assert len(root.children) == 1
+        assert root.children[0].tag == "p"
+    
+        markdown = """This is paragraph 1
+    
+        This is paragraph 2"""
+        root = markdown_to_html_node(markdown)
+        assert root.tag == "div"
+        assert len(root.children) == 2
+        assert root.children[0].tag == "p"
+        assert root.children[1].tag == "p"
+    
+        markdown = """# Header
+    
+        * Item 1
+        * Item 2"""
+        root = markdown_to_html_node(markdown)
+        assert root.tag == "div"
+        assert len(root.children) == 2
+        assert root.children[0].tag == "h1"
+        assert root.children[1].tag == "ul"
+        assert len(root.children[1].children) == 2
 
 if __name__ == "__main__":
     unittest.main()
