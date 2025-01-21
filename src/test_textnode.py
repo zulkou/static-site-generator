@@ -121,8 +121,6 @@ class TestTextNode(unittest.TestCase):
     def test_split_nodes(self):
         text = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)" 
         nodes = text_to_textnodes(text)
-        for i, n in enumerate(nodes):
-            print(f"Node {i}: text='{n.text}', type={n.text_type}, url={n.url}")
 
     def test_block_to_block_type(self):
         assert block_to_block_type("# Heading") == "heading"
@@ -175,6 +173,16 @@ class TestTextNode(unittest.TestCase):
         assert root.children[0].tag == "h1"
         assert root.children[1].tag == "ul"
         assert len(root.children[1].children) == 2
+
+    def test_extract_title(self):
+        markdown = "# This is header"
+        result = extract_title(markdown)
+        expected = "This is header"
+        self.assertEqual(result, expected)
+    def test_extract_title2(self):
+        markdown = "#This is not header"
+        with self.assertRaises(Exception):
+            extract_title(markdown)
 
 if __name__ == "__main__":
     unittest.main()

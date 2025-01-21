@@ -17,7 +17,7 @@ class HTMLNode:
         return "".join(map(lambda item: f" {item[0]}=\"{item[1]}\"", self.props.items()))  
 
     def __repr__(self):
-        return f"HTMLNode({self.tag}, {self.value}, {self.children}, {self.props}"
+        return f"HTMLNode(\"{self.tag}\", \"{self.value}\", {self.children}, {self.props})"
 
     def __eq__(self, other):
         if not isinstance(other, HTMLNode):
@@ -28,8 +28,12 @@ class HTMLNode:
                 self.props == other.props)
 
 class LeafNode(HTMLNode):
-    def __init__(self, tag, value, props = None):
-        super().__init__(tag, value, None, props)
+    def __init__(self, tag, text, props = None):
+        super().__init__(tag, text, None, props)
+    
+    @property
+    def text(self):
+        return self.value
 
     def to_html(self):
         if self.value is None:

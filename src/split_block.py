@@ -2,6 +2,13 @@ from htmlnode import *
 from textnode import *
 from split_inline import *
 
+def extract_title(markdown):
+    if not markdown.startswith("# "):
+        raise Exception
+    
+    title = markdown.lstrip("# ")
+    return title
+
 def markdown_to_blocks(markdown):
     doc = markdown.split("\n")
     result = []
@@ -68,14 +75,16 @@ def markdown_to_html_node(markdown):
     blocks = markdown_to_blocks(markdown)
     children = []
     for block in blocks:
-        node = block_to_html_node(block, block_to_block_type(block))
+        block_type = block_to_block_type(block)
+        node = block_to_html_node(block, block_type)
         children.append(node)
-    return HTMLNode("div", None, children)
+    root = ParentNode("div", children, None)
+    return root
 
 def block_to_html_node(block, block_type):
     if block_type == "paragraph":
         children = text_to_children(block)
-        return HTMLNode("p", None, children)
+        return ParentNode("p", children, None)
     if block_type == "heading":
         count = 0
         for char in block:
@@ -85,28 +94,29 @@ def block_to_html_node(block, block_type):
                 break
         cleaned = block.lstrip("#").strip(" ")
         children = text_to_children(cleaned)
-        return HTMLNode(f"h{count}", None, children)
+        return ParentNode(f"h{count}", children, None)
     if block_type == "code":
-        child = [HTMLNode("code", block.strip("` "))]
-        return HTMLNode("pre", None, child)
+        code_text = LeafNode(None, block.strip("` "))
+        child = [ParentNode("code", [code_text])]
+        return ParentNode("pre", child, None)
     if block_type == "ordered_list":
         children = []
         for line in block.split("\n"):
             cleaned = line.lstrip("1234567890.").strip(" ")
             inner_children = text_to_children(cleaned)
-            children.append(HTMLNode("li", None, inner_children))
-        return HTMLNode("ol", None, children)
+            children.append(ParentNode("li", inner_children, None))
+        return ParentNode("ol", children, None)
     if block_type == "unordered_list":
         children = []
         for line in block.split("\n"):
             cleaned = line.lstrip("-* ").strip(" ")
             inner_children = text_to_children(cleaned)
-            children.append(HTMLNode("li", None, inner_children))
-        return HTMLNode("ul", None, children)
+            children.append(ParentNode("li", inner_children, None))
+        return ParentNode("ul", children, None)
     if block_type == "quote":
         cleaned = block.lstrip(">").strip(" ")
         children = text_to_children(cleaned)
-        return HTMLNode("blockquote", None, children)
+        return ParentNode("blockquote", children, None)
 
 def text_to_children(text):
     children = []

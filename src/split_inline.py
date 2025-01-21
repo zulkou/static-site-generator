@@ -65,7 +65,7 @@ def split_nodes_link(old_nodes):
             text_track = split_node[1]
 
         if text_track:
-            result.append(text_track, TextType.TEXT)
+            result.append(TextNode(text_track, TextType.TEXT))
     return result
 
 def text_to_textnodes(text):
@@ -74,5 +74,5 @@ def text_to_textnodes(text):
     nodes = split_nodes_image(nodes)
     delimiters = [("**", TextType.BOLD), ("*", TextType.ITALIC), ("`", TextType.CODE)]
     for delimiter, text_type in delimiters:
-        nodes = split_nodes_delimiter(nodes, delimiter, text_type) 
+        nodes = split_nodes_delimiter(nodes, delimiter, text_type)
     return nodes
