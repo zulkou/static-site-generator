@@ -1,5 +1,6 @@
 import os
 import shutil
+from pathlib import Path
 from split_block import extract_title, markdown_to_html_node
 
 def copy_static(src, dst):
@@ -19,24 +20,47 @@ def copy_static(src, dst):
 
 def generate_page(from_path, template_path, dest_path):
     print(f"Generating page from \"{from_path}\" to \"{dest_path}\" using \"{template_path}\"")
-    with open(from_path) as src, open(template_path) as tmplt:
+    with open(str(from_path)) as src, open(str(template_path)) as tmplt:
         source = src.read()
         template = tmplt.read()
         
-        content = markdown_to_html_node(source)
-        print(f"Type of content: {type(content)}")  # Add this debug line
-        html_content = content.to_html()
+        print(f"About to process markdown from {from_path}")
+        try:
+            content = markdown_to_html_node(source)
+            html_content = content.to_html()
+        except Exception as e:
+            print(f"Error processing markdown in {from_path}")
+            print(f"Error details: {str(e)}")
+            raise
 
         title = extract_title(source)
 
-        # Replace both placeholders in the template
         final_html = template.replace("{{ Title }}", title)
         final_html = final_html.replace("{{ Content }}", html_content)
 
-    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+    os.makedirs(os.path.dirname(str(dest_path)), exist_ok=True)
 
-    with open(dest_path, "w") as dest:
+    with open(str(dest_path), "w") as dest:
         dest.write(final_html)
 
-copy_static("static", "public")
-generate_page("content/index.md", "template.html", "public/index.html")
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    src_dir = Path(dir_path_content)
+    dst_dir = Path(dest_dir_path)
+
+    for path in src_dir.iterdir():
+        if path.is_dir():
+            new_src = src_dir / path.name
+            new_dst = dst_dir / path.name
+
+            new_dst.mkdir(exist_ok=True, parents=True)
+            generate_pages_recursive(new_src, template_path, new_dst)
+        elif path.is_file():
+            if path.suffix == ".md":
+                dst_file = dst_dir / (path.stem + ".html")
+                generate_page(path, template_path, dst_file)
+
+def main():
+    generate_pages_recursive("content", "template.html", "public")
+
+if __name__ == "__main__":
+    main()

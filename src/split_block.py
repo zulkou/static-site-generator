@@ -109,7 +109,7 @@ def block_to_html_node(block, block_type):
     if block_type == "unordered_list":
         children = []
         for line in block.split("\n"):
-            cleaned = line.lstrip("-* ").strip(" ")
+            cleaned = line.lstrip("-*").strip(" ")
             inner_children = text_to_children(cleaned)
             children.append(ParentNode("li", inner_children, None))
         return ParentNode("ul", children, None)
