@@ -55,7 +55,8 @@ def block_to_block_type(block):
 
     all_quotes = True
     for line in lines:
-        if not line.startswith('> '):
+        stripped_line = line.strip()
+        if not stripped_line.startswith('>'):
             all_quotes = False
             break
     if all_quotes:
@@ -114,7 +115,16 @@ def block_to_html_node(block, block_type):
             children.append(ParentNode("li", inner_children, None))
         return ParentNode("ul", children, None)
     if block_type == "quote":
-        cleaned = block.lstrip(">").strip(" ")
+        lines = block.split("\n")
+        cleaned_lines = []
+        for line in lines:
+            stripped = line.strip()
+            if stripped.startswith('> '):
+                cleaned_lines.append(stripped[2:])
+            elif stripped.startswith('>'):
+                cleaned_lines.append(stripped[1:])
+        
+        cleaned = "\n".join(cleaned_lines)
         children = text_to_children(cleaned)
         return ParentNode("blockquote", children, None)
 

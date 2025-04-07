@@ -64,11 +64,10 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, bas
                 generate_page(path, template_path, dst_file, basepath)
 
 def main():
-    basepath = sys.argv[1] if len(sys.argv) <=2 else "/"
+    basepath = sys.argv[1] if len(sys.argv) == 2 else "/"
 
     copy_static("static", "docs")
     generate_pages_recursive("content", "template.html", "docs", basepath)
-
 
 if __name__ == "__main__":
     main()
