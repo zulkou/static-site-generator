@@ -60,6 +60,7 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
                 generate_page(path, template_path, dst_file)
 
 def main():
+    copy_static("static", "public")
     generate_pages_recursive("content", "template.html", "public")
 
 if __name__ == "__main__":
